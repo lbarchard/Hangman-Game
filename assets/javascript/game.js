@@ -67,41 +67,21 @@ function drawTheLetterSpaces() {
 	console.log("Close drawTheLetterSpaces: currentWordDisplay=" + currentWordDisplay)
 }
 
-
-
-
-
 function updatetheCurrentWordsRemainingLetters() {
 	console.log("Enter updatetheCurrentWordsRemainingLetters");
+	var found = false;
 	for (var i=0; i < lettersInWord; i++) {
 		if (theCurrentWordsRemainingLetters[i] == letterChosen) {
 		 	theCurrentWordsRemainingLetters[i] = "";
-		}
+		 	addLetterToGuessedLetters(letterChosen);
+		 	found = true;
+		}		
+	}
 	console.log("Close updatetheCurrentWordsRemainingLetters: theCurrentWordsRemainingLetters=" + theCurrentWordsRemainingLetters);
-		// // else if ()
-		// else {
-		// 	currentWordDisplay = currentWordDisplay + theCurrentWordsRemainingLetters[i];
-		// }			
+	if (found == false) {
+		buzzer.play(); //Need to clean up buzzer logic at some  point.  Logic is found in 2 places and so is the call to play buzzer.
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function isCharacterChosenALetter(c) {
     return c.length === 1 && c.toLowerCase() != c.toUpperCase();
@@ -109,7 +89,6 @@ function isCharacterChosenALetter(c) {
 
 function addLetterToGuessedLetters(letter) {
 	if (guessedLetters.indexOf(letter) >= 0) {
-		buzzer.play();
 		return false;
 	}
 
@@ -125,7 +104,7 @@ function addLetterToGuessedLetters(letter) {
 }
 
 function checkIfTheLetterIsInTheWord(letter) {
-	console.log("Open countTheLettersInTheWord: Letter=" + letter);
+	console.log("Open checkIfTheLetterIsInTheWord: Letter=" + letter);
 	if (theCurrentWord.indexOf(letter) >= 0||(theCurrentWord.indexOf(letter.toUpperCase())) >= 0) {
 		console.log("Close checkIfTheLetterIsInTheWord: checkIfTheLetterIsInTheWord=true");
 		return true;
@@ -136,44 +115,23 @@ function checkIfTheLetterIsInTheWord(letter) {
 	}
 }
 
-function beginGame() {
-	drawTheLetterSpaces();
-}
-
-
 function countTheLettersInTheWord() {
 	console.log("Open countTheLettersInTheWord")
 	lettersInWord = theCurrentWord.length;
 	console.log("Close countTheLettersInTheWord: lettersInWord=" + lettersInWord)
 }
 
-function setTheCurrentWordsRemainingLettersInitialState() {
-	console.log("Open setTheCurrentWordsRemainingLettersInitialState");
+function initializeTheCurrentWordsRemainingLetters() {
+	console.log("Open initializeTheCurrentWordsRemainingLetters");
 	countTheLettersInTheWord();
 	for (var i = 0; i < lettersInWord; i++) {
 		theCurrentWordsRemainingLetters.push(theCurrentWord.charAt(i));
 	}	
-	console.log("Close setTheCurrentWordsRemainingLettersInitialState: theCurrentWordsRemainingLetters="  + theCurrentWordsRemainingLetters);
+	console.log("Close initializeTheCurrentWordsRemainingLetters: theCurrentWordsRemainingLetters="  + theCurrentWordsRemainingLetters);
 	
 }
-		
-function setWordGuessCurrentState() {
-	console.log("Open setWordGuessCurrentState: Letter=" + letter);
-	countTheLettersInTheWord()
-	setTheCurrentWordsRemainingLetters()
-	console.log("Close setWordGuessCurrentState")
-}
 
-function recordCorrectLetters(letter) {
-	console.log("Open recordCorrectLetters")
-	for (var i = 0; i < lettersInWord; i++) {
-		console.log(theCurrentWordsRemainingLetters[i] + "=" + letter);
-		if (theCurrentWordsRemainingLetters[i] == letter) {
-			theCurrentWordsRemainingLetters[i] = "__ ";
-		}
-	}
-	console.log("Close recordCorrectLetters theCurrentWordsRemainingLetters=" + theCurrentWordsRemainingLetters)
-}
+
 //*************************End Functions***********************//
 
 
@@ -184,8 +142,8 @@ console.log("Call getTheWord") //Need to get a word that people will be guessing
 getTheWord();
 
 document.getElementById("startGame").onclick = function(event) { //Waits for someone to "Click to Start"		
-	console.log("Call setTheCurrentWordsRemainingLettersInitialState") //Puts all the letters in the word into an array.
-	setTheCurrentWordsRemainingLettersInitialState();
+	console.log("Call initializeTheCurrentWordsRemainingLetters") //Puts all the letters in the word into an array.
+	initializeTheCurrentWordsRemainingLetters();
 
 	console.log("Call drawTheLetterSpaces"); //This draws the letters - draws __ if a letter has not been guessed
 	drawTheLetterSpaces();
@@ -197,14 +155,9 @@ document.getElementById("startGame").onclick = function(event) { //Waits for som
 
 		if (isCharacterChosenALetter(letterChosen)) {
 			console.log("it's a letter!");
-			console.log("Call recordCorrectLetters: letterChosen=" + letterChosen); //This draws the letters - draws __ if a letter has not been guessed
-			//recordCorrectLetters(letterChosen);
 			updatetheCurrentWordsRemainingLetters();
 			drawTheLetterSpaces();
-			// IF THERE ARE NO MORE LETTERS TO POP WINNER
-			if (addLetterToGuessedLetters(letterChosen)) {
-				checkIfTheLetterIsInTheWord(letterChosen);
-			}
+			addLetterToGuessedLetters(letterChosen)
 		}
 		else {
 			console.log("it's not a letter!");
