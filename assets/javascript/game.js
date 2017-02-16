@@ -9,10 +9,10 @@ var letterChosen
 //***Variables tracking guessed and missed letters
 var arrLettersInWord = []
 var arrRemainingLettersInWord = []
-var guessedLetters = []
+var guessedLetters = ""
 var arrAllGuessedLetters = []
 var arrWronglyGuessedLetters = []
-var arrCorrectlyGuessedLetters = []
+var arrCorrectlyGuessedLetters = ["-"," ","'"]
 var arrCharactersToDraw = []
 
 //***Stats on the current game
@@ -29,7 +29,7 @@ var currentWordDisplay = ""
 
 //***API connection information
 var wordnikAPIKey = "api_key=832a8a63c3f665444c64e1e43b801485eec232b9ad910af7b";
-var wordnikURL = "http://api.wordnik.com:80/v4/words.json/randomWord?";
+var wordnikURL = "http://api.wordnik.com:80/v4/words.json/randomWord?hasDictionaryDef=true&excludePartOfSpeech=family-name,given-name,proper-noun,proper-noun-plural,proper-noun-posessive&minCorpusCount=10000&maxCorpusCount=-1&minDictionaryCount=3&maxDictionaryCount=-1&minLength=5&maxLength=-1&";
 
 //***Sounds to play
 var buzzer = new Audio('./assets/sounds/buzzer.mp3');
@@ -46,7 +46,6 @@ var buzzer = new Audio('./assets/sounds/buzzer.mp3');
 //***set - updates the value of an object or variable
 function setVariables() {
 	setNumLettersInWord();
-	setLettersInWord();
 	setLettersInWord();
 	//setRemainingLettersInWord();
 }
@@ -167,6 +166,7 @@ function setGuessedLetters() {
 			else {
 				if (arrWronglyGuessedLetters.indexOf(letterChosen) === -1 ) {
 					addWronglyGuessedLetters();
+					guessedLetters = guessedLetters + " " + letterChosen;
 					playTryAgainSound();
 				}
 			}
@@ -175,7 +175,7 @@ function setGuessedLetters() {
 	else {
 		playTryAgainSound();
 	}
-
+	document.getElementById('guessedLetters').innerHTML = guessedLetters	
 }
 
 
@@ -219,7 +219,7 @@ function isLoss() {
 	if (numRemainingGuesses === 0) {
 		document.getElementById('currentWordDisplay').innerHTML = "You Lose";
 		numLosses = numLosses + 1
-
+		document.getElementById('losses').innerHTML = "Losses  = " + numLosses;	
 	}
 }
 
@@ -227,7 +227,8 @@ function  isWin() {
 	setRemainingLettersInWord();
 	if (arrRemainingLettersInWord.length === 0) {
 		document.getElementById('currentWordDisplay').innerHTML = "You Win";
-		numWins = numWins + 1		
+		numWins = numWins + 1
+		document.getElementById('wins').innerHTML = "Wins  = " + numWins;		
 	}
 }
 
