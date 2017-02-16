@@ -1,31 +1,31 @@
 //***********************Begin Global Variables***********************//
 //***Variables about the current word
 var strTheWord
-var numLettersInWord//CAN I DELETE??
+var numLettersInWord
 
 //***The current guess
 var letterChosen
 
 //***Variables tracking guessed and missed letters
-var arrLettersInWord = []
-var arrRemainingLettersInWord = []
-var guessedLetters = ""
-var arrAllGuessedLetters = []
-var arrWronglyGuessedLetters = []
-var arrCorrectlyGuessedLetters = ["-"," ","'"]
-var arrCharactersToDraw = []
+var arrLettersInWord
+var arrRemainingLettersInWord
+var guessedLetters
+var arrAllGuessedLetters
+var arrWronglyGuessedLetters
+var arrCorrectlyGuessedLetters
+var arrCharactersToDraw
 
 //***Stats on the current game
-var numMissedLetters = 0
-var numRemainingGuesses = 15
+var numMissedLetters
+var numRemainingGuesses
 
 //***Stats on the current session
 var numWins = 0
 var numLosses = 0
 
 
-var guessedLettersDisplay = ""
-var currentWordDisplay = ""
+var guessedLettersDisplay
+var currentWordDisplay
 
 //***API connection information
 var wordnikAPIKey = "api_key=832a8a63c3f665444c64e1e43b801485eec232b9ad910af7b";
@@ -157,23 +157,19 @@ function isCharacterChosenALetter(c) {
 
 function setGuessedLetters() {
 	if (isCharacterChosenALetter(letterChosen)) {
-		if (isLetterInAllGuessedLetters()) {
+		if (arrCorrectlyGuessedLetters.indexOf(letterChosen)>=0) {
+			//do nothing - no need to add letter to anything, no need to buzz
+		}
+		else if (isLetterInRemainingLettersInWord()) {
+			addCorrectlyGuessedLetters();			
 		}
 		else {
-			if (isLetterInRemainingLettersInWord()) {
-				addCorrectlyGuessedLetters();			
-			}
-			else {
-				if (arrWronglyGuessedLetters.indexOf(letterChosen) === -1 ) {
-					addWronglyGuessedLetters();
-					guessedLetters = guessedLetters + " " + letterChosen;
-					playTryAgainSound();
-				}
+			if (arrWronglyGuessedLetters.indexOf(letterChosen) === -1 ) {
+				addWronglyGuessedLetters();
+				guessedLetters = guessedLetters + " " + letterChosen;
+				playTryAgainSound();
 			}
 		}
-	}
-	else {
-		playTryAgainSound();
 	}
 	document.getElementById('guessedLetters').innerHTML = guessedLetters	
 }
@@ -219,7 +215,8 @@ function isLoss() {
 	if (numRemainingGuesses === 0) {
 		document.getElementById('currentWordDisplay').innerHTML = "You Lose";
 		numLosses = numLosses + 1
-		document.getElementById('losses').innerHTML = "Losses  = " + numLosses;	
+		document.onkeydown = null;
+		initialize()
 	}
 }
 
@@ -228,7 +225,9 @@ function  isWin() {
 	if (arrRemainingLettersInWord.length === 0) {
 		document.getElementById('currentWordDisplay').innerHTML = "You Win";
 		numWins = numWins + 1
-		document.getElementById('wins').innerHTML = "Wins  = " + numWins;		
+		document.getElementById('wins').innerHTML = "Wins  = " + numWins;
+		document.onkeydown = null;	
+		initialize()	
 	}
 }
 
@@ -237,8 +236,45 @@ function  isWin() {
 //*******************Main Program*********************//
 console.log("Enter Main Thread")  //This is the beginning of the program;
 window.onload = function(){
+	initialize();
+};
+
+
+
+function initialize() {
+
+	//***Variables about the current word
+	strTheWord = ""
+	numLettersInWord = 0
+
+	//***The current guess
+	letterChosen = ""
+
+	//***Variables tracking guessed and missed letters
+	arrLettersInWord = []
+	arrRemainingLettersInWord = []
+	guessedLetters = ""
+	arrAllGuessedLetters = []
+	arrWronglyGuessedLetters = []
+	arrCorrectlyGuessedLetters = ["-"," ","'"]
+	arrCharactersToDraw = []
+
+	//***Stats on the current game
+	numMissedLetters = 0
+	numRemainingGuesses = 15
+
+	guessedLettersDisplay = ""
+	currentWordDisplay = ""
+
 	getTheWord(); //Need to get a word that people will be guessing.
-	document.getElementById("startGame").onclick = function(event) { //Waits for someone to "Click to Start"	
+	main();
+}
+
+
+function main() {
+	
+	document.getElementById("startGame").onclick = function(event) {
+		document.getElementById("startGame").onclick = null;	
 		setVariables(); //Initializes some arrays now that we have a word needed to perform future functions
 		drawCharacters(); //This draws the letters - draws __ if a letter has not been guessed
 		document.onkeydown = function(event) { //Wait for someone to press a letter for their guess
@@ -251,4 +287,4 @@ window.onload = function(){
 			isLoss();
 		}
 	}
-};
+}
