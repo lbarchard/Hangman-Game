@@ -1,24 +1,23 @@
-console.log("Application Starting");
-
 //***********************Begin Global Variables***********************//
 //***Variables about the current word
 var strTheWord
-var numLettersInWord
+var numLettersInWord//CAN I DELETE??
 
 //***The current guess
 var letterChosen
 
 //***Variables tracking guessed and missed letters
 var arrLettersInWord = []
-var theCurrentWordsRemainingLetters = []
+var arrRemainingLettersInWord = []
 var guessedLetters = []
+var arrAllGuessedLetters = []
 var arrWronglyGuessedLetters = []
 var arrCorrectlyGuessedLetters = []
-
+var arrCharactersToDraw = []
 
 //***Stats on the current game
 var numMissedLetters = 0
-var remainingGuesses = 15
+var numRemainingGuesses = 15
 
 //***Stats on the current session
 var numWins = 0
@@ -45,11 +44,23 @@ var buzzer = new Audio('./assets/sounds/buzzer.mp3');
 //***is - returns TRUE or FALSE for the requested check
 //***to - converts an object or data type to a different object or data type
 //***set - updates the value of an object or variable
+function setVariables() {
+	setNumLettersInWord();
+	setLettersInWord();
+	setLettersInWord();
+	//setRemainingLettersInWord();
+}
+
+function setNumLettersInWord() {
+	console.log("Open setNumLettersInWord")
+	numLettersInWord = strTheWord.length;
+	console.log("Close setNumLettersInWord: numLettersInWord=" + numLettersInWord)
+}
 
 
 
 function getTheWord() {
-	console.log("Open getTheWord")
+	console.log("Enter getTheWord")
 	var xmlhttp = new XMLHttpRequest();
 	xmlhttp.onreadystatechange = function() {
     	if (this.readyState == 4 && this.status == 200) {
@@ -57,7 +68,7 @@ function getTheWord() {
         	strTheWord = myObj.word;
         	strTheWord = strTheWord.toLowerCase()
           	document.getElementById("startGame").disabled = false;
-        	console.log("Close getTheWord: strTheWord=" + strTheWord)
+        	console.log("Exit getTheWord: strTheWord=" + strTheWord)
        	}
 	};
 	var getWordFromWordnik = wordnikURL + wordnikAPIKey;
@@ -65,85 +76,79 @@ function getTheWord() {
 	xmlhttp.send();
 }
 
-function isLetterInWord(letter) {
-	if (arrLettersInWord.indexOf(letter) >= 0) {
-		return true;
+function addWronglyGuessedLetters() {
+	console.log("Enter addWronglyGuessedLetters");
+	if (arrWronglyGuessedLetters.indexOf(letterChosen) === -1) {
+		arrWronglyGuessedLetters.push(letterChosen);
 	}
-	else {
-		return false;
-	}
+	console.log("Exit addWronglyGuessedLetters: arrWronglyGuessedLetters=" + arrWronglyGuessedLetters);	
 }
 
-function addWronglyGuessedLetters(letter) {
-	arrWronglyGuessedLetters = arrWronglyGuessedLetters.push(letter);
-}
-
-function addCorrectlyGuessedLetters(letter) {
-	arrCorrectlyGuessedLetters = arrCorrectlyGuessedLetters.push(letter);
+function addCorrectlyGuessedLetters() {
+	console.log("Enter addCorrectlyGuessedLetters");
+	if (arrCorrectlyGuessedLetters.indexOf(letterChosen) === -1) {
+		arrCorrectlyGuessedLetters.push(letterChosen);
+	}
+	console.log("Exit addCorrectlyGuessedLetters: arrCorrectlyGuessedLetters=" + arrCorrectlyGuessedLetters);	
 }
 
 function toCharacterArrayFromString(string) {
-	console.log("Enter toCharacterArrayFromString - string=" + string);
+	console.log("Enter toCharacterArrayFromString: string=" + string);
 	var arrCharacters = [];
 	for (var i = 0; i < string.length; i++) {
 		arrCharacters.push(string.charAt(i));
 	}
-	console.log("Exit toCharacterArrayFromString - myCharacterArray=" + arrCharacters);
+	console.log("Exit toCharacterArrayFromString: myCharacterArray=" + arrCharacters);
 	return arrCharacters;		
 }
 
-function setLettersInWord(word) {
-	console.log("Enter setLettersInWord - word=" + word);
-	arrLettersInWord = toCharacterArrayFromString(word);
-	console.log("Exit setLettersInWord - arrLettersInWord=" + arrLettersInWord);
+function setLettersInWord() {
+	console.log("Enter setLettersInWord");
+	arrLettersInWord = toCharacterArrayFromString(strTheWord);
+	console.log("Exit setLettersInWord: arrLettersInWord=" + arrLettersInWord);
 }
 
 function setRemainingLettersInWord() { //This function can be made more readable
-	for (var i = 0; i <= arrCorrectlyGuessedLetters.length; i++) {
+	console.log("Enter setRemainingLettersInWord");
+	arrRemainingLettersInWord = arrLettersInWord
+	for (var i = 0; i < arrCorrectlyGuessedLetters.length; i++) {
 		while (arrRemainingLettersInWord.indexOf(arrCorrectlyGuessedLetters[i]) != -1) {
 			arrRemainingLettersInWord.splice((arrRemainingLettersInWord.indexOf(arrCorrectlyGuessedLetters[i])),1);
 		}
 	}
+	console.log("Exit setRemainingLettersInWord: arrRemainingLettersInWord=" + arrRemainingLettersInWord);
 }
 
-
-
-
-
-
-
-
-//**************************Need to fix function below as it breaks check for Win call.  Should really keep letters in word in array and then cycle through them to see if they should be drawn or not
-function drawTheLetterSpaces() {
-	console.log("Enter drawTheLetterSpaces");
-	currentWordDisplay = ""
-	for (var i=0; i < numLettersInWord; i++) {
-		if (theCurrentWordsRemainingLetters[i] == "") {
-			currentWordDisplay = currentWordDisplay + strTheWord.charAt(i) + " ";
-		}
-		else {
-			currentWordDisplay = currentWordDisplay + "__ ";
-		}
-	}
-	document.getElementById("currentWordDisplay").innerHTML = currentWordDisplay; 
-	console.log("Close drawTheLetterSpaces: currentWordDisplay=" + currentWordDisplay)
+function playTryAgainSound() {
+	console.log("Enter playTryAgainSound");
+	buzzer.play();
+	console.log("Exit playTryAgainSound");
 }
 
-function 	updatetheCurrentWordsRemainingLetters() {
-	console.log("Enter updatetheCurrentWordsRemainingLetters");
-	var found = false;
-	for (var i=0; i < numLettersInWord; i++) {
-		if (theCurrentWordsRemainingLetters[i] == letterChosen) {
-		 	theCurrentWordsRemainingLetters[i] = "";
-		 	found = true;
-		}		
+function isLetterInRemainingLettersInWord() {
+	console.log("Enter isLetterInRemainingLettersInWord");
+	var result = isStringFoundInArray(letterChosen,arrRemainingLettersInWord);
+	console.log("Exit isLetterInRemainingLettersInWord: isLetterInRemainingLettersInWord=" + result);
+	return result;
+
+}
+
+function isLetterInAllGuessedLetters() {
+	return isStringFoundInArray(letterChosen,arrAllGuessedLetters);
+}
+
+function isLetterInWord() {
+	return isStringFoundInArray(letterChosen,arrLettersInWord);
+}
+
+function isStringFoundInArray(string, array) {
+	console.log("Enter isStringFoundInArray: string=" + string + " array=" + array);
+	var notFound = -1
+	if (array.indexOf(string) == notFound) {
+		return false;
 	}
-	console.log("Close updatetheCurrentWordsRemainingLetters: theCurrentWordsRemainingLetters=" + theCurrentWordsRemainingLetters);
-	if (found == false) {
-		numMissedLetters = numMissedLetters + 1;	
-		updateRemainingGuesses();
-		buzzer.play();
-		//*******************************************************************
+	else {
+		return true;
 	}
 }
 
@@ -151,93 +156,98 @@ function isCharacterChosenALetter(c) {
     return c.length === 1 && c.toLowerCase() != c.toUpperCase();
 }
 
-function addLetterToGuessedLetters(letter) {
-	if (guessedLetters.indexOf(letter) >= 0) {
-		return false;
+function setGuessedLetters() {
+	if (isCharacterChosenALetter(letterChosen)) {
+		if (isLetterInAllGuessedLetters()) {
+		}
+		else {
+			if (isLetterInRemainingLettersInWord()) {
+				addCorrectlyGuessedLetters();			
+			}
+			else {
+				if (arrWronglyGuessedLetters.indexOf(letterChosen) === -1 ) {
+					addWronglyGuessedLetters();
+					playTryAgainSound();
+				}
+			}
+		}
 	}
 	else {
-		guessedLetters.push(letter);
-		console.log("Adding letter '" + letter + "' to list of letters chosen")
-		guessedLettersDisplay = guessedLettersDisplay + "  " + letter;
-		document.getElementById("guessedLetters").innerHTML = guessedLettersDisplay;
-		return true;
+		playTryAgainSound();
 	}
+
 }
 
-function checkIfTheLetterIsInTheWord(letter) {
-	console.log("Open checkIfTheLetterIsInTheWord: Letter=" + letter);
-	if (strTheWord.indexOf(letter) >= 0||(strTheWord.indexOf(letter.toUpperCase())) >= 0) {
-		console.log("Close checkIfTheLetterIsInTheWord: checkIfTheLetterIsInTheWord=true");
-		return true;
-	}
-	else {
-		console.log("Close checkIfTheLetterIsInTheWord: checkIfTheLetterIsInTheWord=true");
-		return false;
-	}
-}
 
-function countTheLettersInTheWord() {
-	console.log("Open countTheLettersInTheWord")
-	numLettersInWord = strTheWord.length;
-	console.log("Close countTheLettersInTheWord: numLettersInWord=" + numLettersInWord)
-}
-
-function initializeTheCurrentWordsRemainingLetters() {
-	console.log("Open initializeTheCurrentWordsRemainingLetters");
-	setLettersInWord(strTheWord);	
-	theCurrentWordsRemainingLetters = arrLettersInWord
-	console.log("Close initializeTheCurrentWordsRemainingLetters: theCurrentWordsRemainingLetters="  + theCurrentWordsRemainingLetters);
+function setArrCharactersToDraw() {
+	console.log("Enter setArrCharactersToDraw");
 	
+	for (var i = 0; i < strTheWord.length; i++) {
+		 if (arrCorrectlyGuessedLetters.indexOf(arrLettersInWord[i]) === -1) {
+		 	arrCharactersToDraw[i] = " __ "
+		 }
+		 else {
+		 	arrCharactersToDraw[i] = " " + arrLettersInWord[i] + " ";
+		 }
+	}
+	console.log("Exit setArrCharactersToDraw: arrCharactersToDraw=" + arrCharactersToDraw)
 }
 
-function updateRemainingGuesses() {
-	console.log("Open updateRemainingGuesses");
 
-	remainingGuesses = 15 - numMissedLetters;	
-	document.getElementById("remainingGuesses").innerHTML = remainingGuesses;
+function drawCharacters() {
+	console.log("Enter drawCharacters");
+	setArrCharactersToDraw();
+	var strCharactersToDraw = "";
+	for (var i = 0; i < arrCharactersToDraw.length; i++) {
+		strCharactersToDraw = strCharactersToDraw + arrCharactersToDraw[i];
+		document.getElementById('currentWordDisplay').innerHTML = strCharactersToDraw;
+	}
+	console.log("Exit drawCharacters: strCharactersToDraw=" + strCharactersToDraw);
 
-	console.log("Close updateRemainingGuesses: remainingGuesses="  + remainingGuesses);
 }
 
+
+function setNumRmainingGuesses() {
+	console.log("Enter setNumRmainingGuesses");
+	numRemainingGuesses = 15 - arrWronglyGuessedLetters.length;	
+	document.getElementById("remainingGuesses").innerHTML = numRemainingGuesses;
+	console.log("Exit setNumRmainingGuesses: numRemainingGuesses="  + numRemainingGuesses);
+}
+
+function isLoss() {
+	setNumRmainingGuesses();
+	if (numRemainingGuesses === 0) {
+		document.getElementById('currentWordDisplay').innerHTML = "You Lose";
+		numLosses = numLosses + 1
+
+	}
+}
+
+function  isWin() {
+	setRemainingLettersInWord();
+	if (arrRemainingLettersInWord.length === 0) {
+		document.getElementById('currentWordDisplay').innerHTML = "You Win";
+		numWins = numWins + 1		
+	}
+}
 
 //*************************End Functions***********************//
 
-
-console.log("Open Main Thread")  //This is the beginning of the program;
+//*******************Main Program*********************//
+console.log("Enter Main Thread")  //This is the beginning of the program;
 window.onload = function(){
-
-	console.log("Call getTheWord") //Need to get a word that people will be guessing.
-	getTheWord();
-
-	document.getElementById("startGame").onclick = function(event) { //Waits for someone to "Click to Start"		
-		console.log("Call initializeTheCurrentWordsRemainingLetters") //Puts all the letters in the word into an array.
-		initializeTheCurrentWordsRemainingLetters();
-
-		console.log("Call drawTheLetterSpaces"); //This draws the letters - draws __ if a letter has not been guessed
-		drawTheLetterSpaces();
-
-		//Below is when someone guesses a letter by pressing the keyboard
-		console.log("Listening for onkeydown")
-		document.onkeydown = function(event) {
+	getTheWord(); //Need to get a word that people will be guessing.
+	document.getElementById("startGame").onclick = function(event) { //Waits for someone to "Click to Start"	
+		setVariables(); //Initializes some arrays now that we have a word needed to perform future functions
+		drawCharacters(); //This draws the letters - draws __ if a letter has not been guessed
+		document.onkeydown = function(event) { //Wait for someone to press a letter for their guess
 			letterChosen = event.key.toLowerCase();
-
-			if (isCharacterChosenALetter(letterChosen)) {
-				console.log("it's a letter!");
-				updatetheCurrentWordsRemainingLetters();
-				drawTheLetterSpaces();
-				addLetterToGuessedLetters(letterChosen)
-			}
-			else {
-				console.log("it's not a letter!");
-			}
-			if (remainingGuesses == 0) {
-				document.getElementById("currentWordDisplay").innerHTML = "You Lose";
-			}
-
-			if (theCurrentWordsRemainingLetters.length == 0) {
-				document.getElementById("currentWordDisplay").innerHTML = "You Win";
-			}
-				
+			setRemainingLettersInWord();
+			setVariables();
+			setGuessedLetters();
+			drawCharacters();
+			isWin();
+			isLoss();
 		}
 	}
 };
