@@ -29,8 +29,8 @@ var currentWordDisplay;
 
 //***API connection information
 var wordnikAPIKey = "api_key=832a8a63c3f665444c64e1e43b801485eec232b9ad910af7b";
-var wordnikWordURL = "http://api.wordnik.com:80/v4/words.json/randomWord?hasDictionaryDef=true&excludePartOfSpeech=family-name,given-name,proper-noun,proper-noun-plural,proper-noun-posessive&minCorpusCount=10000&maxCorpusCount=-1&minDictionaryCount=3&maxDictionaryCount=-1&minLength=5&maxLength=12&";
-var wordnikDefintionURL = "http://api.wordnik.com:80/v4/word.json/rusher/definitions?limit=1&includeRelated=true&useCanonical=false&includeTags=false&"
+var wordnikWordURL = "https://api.wordnik.com:80/v4/words.json/randomWord?hasDictionaryDef=true&excludePartOfSpeech=family-name,given-name,proper-noun,proper-noun-plural,proper-noun-posessive&minCorpusCount=10000&maxCorpusCount=-1&minDictionaryCount=3&maxDictionaryCount=-1&minLength=5&maxLength=12&";
+var wordnikDefintionURL = "https://api.wordnik.com:80/v4/word.json/rusher/definitions?limit=1&includeRelated=true&useCanonical=false&includeTags=false&"
 
 //***Sounds to play
 var buzzer = new Audio('./assets/sounds/buzzer.mp3');
