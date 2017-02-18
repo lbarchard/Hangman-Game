@@ -1,6 +1,7 @@
 (function(){//***********************Begin Global Variables***********************//
 //***Variables about the current word
 var strTheWord;
+var strTheDefintion;
 var numLettersInWord;
 
 //***The current guess
@@ -23,14 +24,13 @@ var numRemainingGuesses;
 var numWins = 0;
 var numLosses = 0;
 var numStartingGuesses = 5;
-
-
 var guessedLettersDisplay;
 var currentWordDisplay;
 
 //***API connection information
 var wordnikAPIKey = "api_key=832a8a63c3f665444c64e1e43b801485eec232b9ad910af7b";
-var wordnikURL = "http://api.wordnik.com:80/v4/words.json/randomWord?hasDictionaryDef=true&excludePartOfSpeech=family-name,given-name,proper-noun,proper-noun-plural,proper-noun-posessive&minCorpusCount=10000&maxCorpusCount=-1&minDictionaryCount=3&maxDictionaryCount=-1&minLength=5&maxLength=12&";
+var wordnikWordURL = "http://api.wordnik.com:80/v4/words.json/randomWord?hasDictionaryDef=true&excludePartOfSpeech=family-name,given-name,proper-noun,proper-noun-plural,proper-noun-posessive&minCorpusCount=10000&maxCorpusCount=-1&minDictionaryCount=3&maxDictionaryCount=-1&minLength=5&maxLength=12&";
+var wordnikDefintionURL = "http://api.wordnik.com:80/v4/word.json/rusher/definitions?limit=1&includeRelated=true&useCanonical=false&includeTags=false&"
 
 //***Sounds to play
 var buzzer = new Audio('./assets/sounds/buzzer.mp3');
@@ -71,8 +71,23 @@ function getTheWord() {
         	console.log("Exit getTheWord: strTheWord=" + strTheWord)
        	}
 	};
-	var getWordFromWordnik = wordnikURL + wordnikAPIKey;
+	var getWordFromWordnik = wordnikWordURL + wordnikAPIKey;
 	xmlhttp.open("GET", getWordFromWordnik, true);
+	xmlhttp.send();
+}
+
+function getTheDefinition() {
+	console.log("Enter getTheDefinition")
+	var xmlhttp = new XMLHttpRequest();
+	xmlhttp.onreadystatechange = function() {
+    	if (this.readyState == 4 && this.status == 200) {
+        	myDef = JSON.parse(this.responseText);
+        	strTheDefintion = myDef.text || "This word doesn't have a definition";
+        	console.log("Exit getTheDefinition: strTheDefintion=" + strTheDefintion)
+       	}
+	};
+	var getDefinitionFromWordnik = wordnikDefintionURL + wordnikAPIKey;
+	xmlhttp.open("GET", getDefinitionFromWordnik, true);
 	xmlhttp.send();
 }
 
@@ -213,6 +228,11 @@ function isLoss() {
 		numLosses = numLosses + 1
 		document.getElementById('losses').innerHTML = numLosses;
 		document.onkeydown = null;
+		setLettersInWord();
+		for (var i = 0; i < arrLettersInWord.length; i++) {
+			document.getElementById('letter' + i).innerHTML = arrLettersInWord[i];
+			//document.getElementById('currentWordDisplay').innerHTML = strCharactersToDraw;
+		}		
 		console.log("Exit isLoss: isLoss=TRUE")
 		return true;
 
@@ -237,7 +257,10 @@ function isGameOver() {
 	console.log("Enter isGameOver");
 	if (isWin()||isLoss()) {
 		prepareForGame();
+		getTheDefinition();
+		return true;
 	};
+	return false;
 	console.log("Exit isGameOver");
 } 
 
@@ -295,7 +318,7 @@ function initialize() {
 
 function main() {
 	document.getElementById("startGame").onclick = function(event) {
-	//	initialize();
+		initialize();
 		document.getElementById("startGame").disabled = true;	
 		setVariables(); //Initializes some arrays now that we have a word needed to perform future functions
 		drawCharacters(); //This draws the letters - draws __ if a letter has not been guessed
