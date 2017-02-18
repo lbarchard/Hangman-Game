@@ -1,0 +1,45 @@
+body {
+	background-color: black;
+}
+
+.scoreBoard {
+	padding-top: 50px;
+	padding-bottom: 50px;
+	background-color: black;
+}
+
+.wrongGuesses {
+	background-color: black;
+	color: white;
+	text-align: center;
+	padding-top: 20px;
+	padding-bottom: 15px;
+	font-size: 30px;
+	height: 80px;
+}
+
+.scoreLabel {
+	text-align: center;
+	color: white;
+	padding-bottom: 20px;
+	font-size: 20px;
+}
+
+.score {
+	text-align: center;
+	color: red;
+	font-size: 50px;
+	/*font-family: 'VT323', monospace;*/
+	font-family: "scoreBoard";
+}
+
+.letter {
+	font-size: 60px;
+	text-align: center;
+	height: 90px;
+}
+
+@font-face {
+    font-family: "scoreBoard";
+    src: url("../fonts/advanced_pixel_lcd-7.ttf") format("truetype");
+}

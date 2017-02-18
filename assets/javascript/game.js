@@ -1,35 +1,36 @@
-//***********************Begin Global Variables***********************//
+(function(){//***********************Begin Global Variables***********************//
 //***Variables about the current word
-var strTheWord
-var numLettersInWord
+var strTheWord;
+var numLettersInWord;
 
 //***The current guess
-var letterChosen
+var letterChosen;
 
 //***Variables tracking guessed and missed letters
-var arrLettersInWord
-var arrRemainingLettersInWord
-var guessedLetters
-var arrAllGuessedLetters
-var arrWronglyGuessedLetters
-var arrCorrectlyGuessedLetters
-var arrCharactersToDraw
+var arrLettersInWord;
+var arrRemainingLettersInWord;
+var guessedLetters;
+var arrAllGuessedLetters;
+var arrWronglyGuessedLetters;
+var arrCorrectlyGuessedLetters;
+var arrCharactersToDraw;
 
 //***Stats on the current game
-var numMissedLetters
-var numRemainingGuesses
+var numMissedLetters;
+var numRemainingGuesses;
 
 //***Stats on the current session
-var numWins = 0
-var numLosses = 0
+var numWins = 0;
+var numLosses = 0;
+var numStartingGuesses = 5;
 
 
-var guessedLettersDisplay
-var currentWordDisplay
+var guessedLettersDisplay;
+var currentWordDisplay;
 
 //***API connection information
 var wordnikAPIKey = "api_key=832a8a63c3f665444c64e1e43b801485eec232b9ad910af7b";
-var wordnikURL = "http://api.wordnik.com:80/v4/words.json/randomWord?hasDictionaryDef=true&excludePartOfSpeech=family-name,given-name,proper-noun,proper-noun-plural,proper-noun-posessive&minCorpusCount=10000&maxCorpusCount=-1&minDictionaryCount=3&maxDictionaryCount=-1&minLength=5&maxLength=-1&";
+var wordnikURL = "http://api.wordnik.com:80/v4/words.json/randomWord?hasDictionaryDef=true&excludePartOfSpeech=family-name,given-name,proper-noun,proper-noun-plural,proper-noun-posessive&minCorpusCount=10000&maxCorpusCount=-1&minDictionaryCount=3&maxDictionaryCount=-1&minLength=5&maxLength=12&";
 
 //***Sounds to play
 var buzzer = new Audio('./assets/sounds/buzzer.mp3');
@@ -45,18 +46,18 @@ var buzzer = new Audio('./assets/sounds/buzzer.mp3');
 //***to - converts an object or data type to a different object or data type
 //***set - updates the value of an object or variable
 function setVariables() {
+	console.log("Enter setVariables")
 	setNumLettersInWord();
 	setLettersInWord();
+	console.log("Exit setVariables")
 	//setRemainingLettersInWord();
 }
 
 function setNumLettersInWord() {
-	console.log("Open setNumLettersInWord")
+	console.log("Enter setNumLettersInWord")
 	numLettersInWord = strTheWord.length;
-	console.log("Close setNumLettersInWord: numLettersInWord=" + numLettersInWord)
+	console.log("Exit setNumLettersInWord: numLettersInWord=" + numLettersInWord)
 }
-
-
 
 function getTheWord() {
 	console.log("Enter getTheWord")
@@ -64,7 +65,7 @@ function getTheWord() {
 	xmlhttp.onreadystatechange = function() {
     	if (this.readyState == 4 && this.status == 200) {
         	myObj = JSON.parse(this.responseText);
-        	strTheWord = myObj.word;
+        	strTheWord = myObj.word || 'placeholder';
         	strTheWord = strTheWord.toLowerCase()
           	document.getElementById("startGame").disabled = false;
         	console.log("Exit getTheWord: strTheWord=" + strTheWord)
@@ -93,10 +94,7 @@ function addCorrectlyGuessedLetters() {
 
 function toCharacterArrayFromString(string) {
 	console.log("Enter toCharacterArrayFromString: string=" + string);
-	var arrCharacters = [];
-	for (var i = 0; i < string.length; i++) {
-		arrCharacters.push(string.charAt(i));
-	}
+	var arrCharacters = string.split("");
 	console.log("Exit toCharacterArrayFromString: myCharacterArray=" + arrCharacters);
 	return arrCharacters;		
 }
@@ -129,15 +127,13 @@ function isLetterInRemainingLettersInWord() {
 	var result = isStringFoundInArray(letterChosen,arrRemainingLettersInWord);
 	console.log("Exit isLetterInRemainingLettersInWord: isLetterInRemainingLettersInWord=" + result);
 	return result;
-
-}
-
-function isLetterInAllGuessedLetters() {
-	return isStringFoundInArray(letterChosen,arrAllGuessedLetters);
 }
 
 function isLetterInWord() {
-	return isStringFoundInArray(letterChosen,arrLettersInWord);
+	console.log("Enter isLetterInWord");
+	var result = isStringFoundInArray(letterChosen,arrLettersInWord);
+	console.log("Exit isLetterInWord: isLetterInWord=" + result);
+	return ;
 }
 
 function isStringFoundInArray(string, array) {
@@ -174,13 +170,12 @@ function setGuessedLetters() {
 	document.getElementById('guessedLetters').innerHTML = guessedLetters	
 }
 
-
 function setArrCharactersToDraw() {
 	console.log("Enter setArrCharactersToDraw");
 	
 	for (var i = 0; i < strTheWord.length; i++) {
 		 if (arrCorrectlyGuessedLetters.indexOf(arrLettersInWord[i]) === -1) {
-		 	arrCharactersToDraw[i] = " __ "
+		 	arrCharactersToDraw[i] = "___"
 		 }
 		 else {
 		 	arrCharactersToDraw[i] = " " + arrLettersInWord[i] + " ";
@@ -189,92 +184,119 @@ function setArrCharactersToDraw() {
 	console.log("Exit setArrCharactersToDraw: arrCharactersToDraw=" + arrCharactersToDraw)
 }
 
-
 function drawCharacters() {
 	console.log("Enter drawCharacters");
 	setArrCharactersToDraw();
 	var strCharactersToDraw = "";
+	for (var j = 0; j < 12; j++) {
+		document.getElementById('letter' + j).innerHTML = "";	
+	}
 	for (var i = 0; i < arrCharactersToDraw.length; i++) {
-		strCharactersToDraw = strCharactersToDraw + arrCharactersToDraw[i];
-		document.getElementById('currentWordDisplay').innerHTML = strCharactersToDraw;
+		document.getElementById('letter' + i).innerHTML = arrCharactersToDraw[i];
+		//document.getElementById('currentWordDisplay').innerHTML = strCharactersToDraw;
 	}
 	console.log("Exit drawCharacters: strCharactersToDraw=" + strCharactersToDraw);
 
 }
 
-
 function setNumRmainingGuesses() {
 	console.log("Enter setNumRmainingGuesses");
-	numRemainingGuesses = 15 - arrWronglyGuessedLetters.length;	
+	numRemainingGuesses = numStartingGuesses - arrWronglyGuessedLetters.length;	
 	document.getElementById("remainingGuesses").innerHTML = numRemainingGuesses;
 	console.log("Exit setNumRmainingGuesses: numRemainingGuesses="  + numRemainingGuesses);
 }
 
 function isLoss() {
 	setNumRmainingGuesses();
-	if (numRemainingGuesses === 0) {
-		document.getElementById('currentWordDisplay').innerHTML = "You Lose";
+	if (numStartingGuesses - arrWronglyGuessedLetters.length === 0) {
+		document.getElementById('guessedLetters').innerHTML = "You Lose";
 		numLosses = numLosses + 1
+		document.getElementById('losses').innerHTML = numLosses;
 		document.onkeydown = null;
-		initialize()
+		console.log("Exit isLoss: isLoss=TRUE")
+		return true;
+
+		//initialize()
 	}
 }
 
 function  isWin() {
 	setRemainingLettersInWord();
 	if (arrRemainingLettersInWord.length === 0) {
-		document.getElementById('currentWordDisplay').innerHTML = "You Win";
+		document.getElementById('guessedLetters').innerHTML = "You Win";
 		numWins = numWins + 1
-		document.getElementById('wins').innerHTML = "Wins  = " + numWins;
-		document.onkeydown = null;	
-		initialize()	
+		document.getElementById('wins').innerHTML = numWins;
+		document.onkeydown = null;
+		console.log("Exit isWin: isWin=TRUE")
+		return true;
+		//initialize()	
 	}
 }
 
-//*************************End Functions***********************//
+function isGameOver() {
+	console.log("Enter isGameOver");
+	if (isWin()||isLoss()) {
+		prepareForGame();
+	};
+	console.log("Exit isGameOver");
+} 
 
 //*******************Main Program*********************//
 console.log("Enter Main Thread")  //This is the beginning of the program;
 window.onload = function(){
-	initialize();
+	prepareForGame();
 };
 
+function prepareForGame() {
+	console.log("Enter prepareForGame");
+	//***Variables about the current word
+	strTheWord = "";
+	numLettersInWord = 0;
+
+	arrLettersInWord = [];
+	arrRemainingLettersInWord = [];
+	guessedLetters = " ";
+	arrAllGuessedLetters = [];
+	arrWronglyGuessedLetters = [];
+	arrCorrectlyGuessedLetters = ["-"," ","'"];
+	arrCharactersToDraw = [];
+
+	numMissedLetters = 0;
+	numRemainingGuesses = numStartingGuesses;
+
+	guessedLettersDisplay = "";
+	currentWordDisplay = "";
+
+	getTheWord(); //Need to get a word that people will be guessing.
+	main()
+	console.log("Exit prepareForGame");
+}
 
 
 function initialize() {
 
-	//***Variables about the current word
-	strTheWord = ""
-	numLettersInWord = 0
-
+	
 	//***The current guess
-	letterChosen = ""
+	letterChosen = "";
 
 	//***Variables tracking guessed and missed letters
-	arrLettersInWord = []
-	arrRemainingLettersInWord = []
-	guessedLetters = ""
-	arrAllGuessedLetters = []
-	arrWronglyGuessedLetters = []
-	arrCorrectlyGuessedLetters = ["-"," ","'"]
-	arrCharactersToDraw = []
 
 	//***Stats on the current game
-	numMissedLetters = 0
-	numRemainingGuesses = 15
+	
+	document.getElementById('guessedLetters').innerHTML = guessedLetters;
+	document.getElementById('losses').innerHTML = numLosses;
+	document.getElementById('wins').innerHTML = numWins;
+	document.getElementById('remainingGuesses').innerHTML = numRemainingGuesses;
 
-	guessedLettersDisplay = ""
-	currentWordDisplay = ""
-
-	getTheWord(); //Need to get a word that people will be guessing.
-	main();
+	
 }
 
 
+
 function main() {
-	
 	document.getElementById("startGame").onclick = function(event) {
-		document.getElementById("startGame").onclick = null;	
+	//	initialize();
+		document.getElementById("startGame").disabled = true;	
 		setVariables(); //Initializes some arrays now that we have a word needed to perform future functions
 		drawCharacters(); //This draws the letters - draws __ if a letter has not been guessed
 		document.onkeydown = function(event) { //Wait for someone to press a letter for their guess
@@ -283,8 +305,10 @@ function main() {
 			setVariables();
 			setGuessedLetters();
 			drawCharacters();
-			isWin();
-			isLoss();
+			isGameOver();
+			
 		}
 	}
 }
+
+})();
